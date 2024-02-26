@@ -4,15 +4,19 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 
-public class ShooterCommand extends Command {
-  /** Creates a new ShooterCommand. */
-  private final ShooterSubsystem shooterSubsystem;
+public class RunShooterTimeBaseCMD extends Command {
+  /** Creates a new RunShooterTimeBaseCMD. */
+   private final ShooterSubsystem shooterSubsystem;
   private double topShooterVolts;
   private double bottomShooterVolts;
-  public ShooterCommand(ShooterSubsystem shooterSubsystem, double topShooterVolts, double bottomShooterVolts) {
+  private double startTime;
+  private double currentTime;
+  private double stopTime;
+  public RunShooterTimeBaseCMD(ShooterSubsystem shooterSubsystem, double topShooterVolts, double bottomShooterVolts) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.shooterSubsystem = shooterSubsystem;
     this.topShooterVolts = topShooterVolts;
@@ -24,26 +28,30 @@ public class ShooterCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("ShooterCMD Started");
+    System.out.println("Run Shooter Time Base Start");
+    startTime = Timer.getFPGATimestamp();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     shooterSubsystem.setShooterSpeed(topShooterVolts, bottomShooterVolts);
-    shooterSubsystem.getShooterVelocity();
+    currentTime = Timer.getFPGATimestamp();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     shooterSubsystem.setShooterSpeed(0, 0);
-    System.out.println("ShooterCMD Stopped");
+    System.out.println("Run Shooter Time Base Stop");
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    if(currentTime - startTime > 3){
+      return true;
+    }
+    else {return false;}
   }
 }
